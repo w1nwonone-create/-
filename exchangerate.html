@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실시간 환율 계산기</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f7f6; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .container { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 350px; text-align: center; }
+        .input-group { margin-bottom: 1rem; text-align: left; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .result { margin-top: 1.5rem; padding: 1rem; background: #e8f5e9; border-radius: 8px; font-weight: bold; color: #2e7d32; font-size: 1.2rem; }
+        .ad-space { margin-top: 2rem; width: 300px; height: 60px; background: #eee; border: 2px dashed #bbb; display: flex; align-items: center; justify-content: center; color: #999; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💱 환율 계산기</h1>
+        <div class="input-group">
+            <label>금액 입력</label>
+            <input type="number" id="amount" value="1000">
+        </div>
+        <div class="input-group">
+            <select id="from-currency"><option value="KRW">원 (KRW)</option><option value="USD">달러 (USD)</option></select>
+        </div>
+        <div class="input-group">
+            <select id="to-currency"><option value="USD" selected>달러 (USD)</option><option value="KRW">원 (KRW)</option></select>
+        </div>
+        <div class="result" id="result-text">결과 표시 중...</div>
+    </div>
+    <div class="ad-space">ADVERTISEMENT - 광고 공간</div>
+
+    <script>
+        async function calculate() {
+            const amount = document.getElementById('amount').value;
+            const from = document.getElementById('from-currency').value;
+            const to = document.getElementById('to-currency').value;
+            try {
+                const res = await fetch(`https://open.er-api.com/v6/latest/${from}`);
+                const data = await res.json();
+                const rate = data.rates[to];
+                document.getElementById('result-text').innerText = (amount * rate).toLocaleString() + " " + to;
+            } catch (e) { document.getElementById('result-text').innerText = "연결 오류"; }
+        }
+        document.querySelectorAll('input, select').forEach(el => el.addEventListener('input', calculate));
+        calculate();
+    </script>
+</body>
+</html>
